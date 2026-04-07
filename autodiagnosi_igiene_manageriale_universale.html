@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autodiagnosi Igiene Manageriale</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+
+  :root {
+    --navy: #1a2744;
+    --navy-light: #253556;
+    --teal: #0d7377;
+    --teal-light: #14919b;
+    --teal-pale: #e0f4f4;
+    --sand: #f5f0e8;
+    --sand-dark: #e8dfd3;
+    --charcoal: #2d2d2d;
+    --warm-gray: #6b6560;
+    --red-muted: #b85042;
+    --amber: #d4a04a;
+    --green-muted: #5a8a6a;
+    --white: #fefcf9;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--sand);
+    color: var(--charcoal);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── INTRO SCREEN ── */
+  .intro-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background: var(--navy);
+    color: var(--white);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .intro-screen::before {
+    content: '';
+    position: absolute;
+    top: -30%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(13,115,119,0.25) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .intro-screen::after {
+    content: '';
+    position: absolute;
+    bottom: -20%;
+    left: -10%;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(212,160,74,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .intro-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--teal-light);
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .intro-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    line-height: 1.15;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .intro-subtitle {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    color: var(--teal-light);
+    margin-bottom: 2.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .intro-desc {
+    max-width: 580px;
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: rgba(254,252,249,0.75);
+    margin-bottom: 3rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .intro-meta {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 3rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .intro-meta-item {
+    text-align: center;
+  }
+
+  .intro-meta-item .num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    color: var(--teal-light);
+  }
+
+  .intro-meta-item .label {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(254,252,249,0.5);
+  }
+
+  .btn-start {
+    position: relative;
+    z-index: 1;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    padding: 1rem 3rem;
+    background: var(--teal);
+    color: var(--white);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .btn-start:hover {
+    background: var(--teal-light);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(13,115,119,0.3);
+  }
+
+  /* ── TEST CONTAINER ── */
+  .test-container {
+    display: none;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* ── PROGRESS ── */
+  .progress-bar-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--sand);
+    padding: 1rem 0 0.75rem;
+    border-bottom: 1px solid var(--sand-dark);
+  }
+
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .progress-section {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    font-weight: 600;
+  }
+
+  .progress-count {
+    font-size: 0.8rem;
+    color: var(--warm-gray);
+  }
+
+  .progress-track {
+    height: 3px;
+    background: var(--sand-dark);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--teal);
+    border-radius: 2px;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  /* ── SCENARIO CARDS ── */
+  .scenario-block {
+    display: none;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .scenario-block.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .scenario-dimension {
+    display: inline-block;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 0.3rem 0.8rem;
+    border-radius: 3px;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .dim-autonomia { background: #e8d5c4; color: #8b5e3c; }
+  .dim-competenza { background: #c4dde8; color: #2a6480; }
+  .dim-relazione { background: #d5e8d0; color: #3c6b3a; }
+  .dim-cambiamento { background: #e0d5e8; color: #5a3c6b; }
+
+  .scenario-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    color: var(--navy);
+    margin-bottom: 0.3rem;
+  }
+
+  .scenario-version {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--teal);
+    margin-bottom: 1.2rem;
+  }
+
+  .scenario-text {
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: var(--charcoal);
+    margin-bottom: 1.8rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--white);
+    border-left: 3px solid var(--teal);
+    border-radius: 0 6px 6px 0;
+  }
+
+  .options-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .option-item {
+    position: relative;
+    padding: 1rem 1.25rem 1rem 3.2rem;
+    background: var(--white);
+    border: 1.5px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+
+  .option-item:hover {
+    border-color: var(--teal-light);
+    background: var(--teal-pale);
+  }
+
+  .option-item.selected {
+    border-color: var(--teal);
+    background: var(--teal-pale);
+  }
+
+  .option-letter {
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background: var(--sand);
+    border: 1.5px solid var(--sand-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--warm-gray);
+    transition: all 0.2s ease;
+  }
+
+  .option-item.selected .option-letter {
+    background: var(--teal);
+    border-color: var(--teal);
+    color: var(--white);
+  }
+
+  /* ── NAVIGATION ── */
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    gap: 1rem;
+  }
+
+  .btn-nav {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    border: none;
+  }
+
+  .btn-prev {
+    background: transparent;
+    color: var(--warm-gray);
+    border: 1.5px solid var(--sand-dark);
+  }
+
+  .btn-prev:hover { border-color: var(--warm-gray); }
+
+  .btn-next {
+    background: var(--navy);
+    color: var(--white);
+  }
+
+  .btn-next:hover {
+    background: var(--navy-light);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(26,39,68,0.25);
+  }
+
+  .btn-next:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-results {
+    background: var(--teal);
+    color: var(--white);
+    font-size: 1rem;
+    padding: 1rem 2.5rem;
+  }
+
+  .btn-results:hover {
+    background: var(--teal-light);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(13,115,119,0.3);
+  }
+
+  /* ── LEVEL 2 INTRO ── */
+  .level-intro {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: var(--navy);
+    color: var(--white);
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+  }
+
+  .level-intro h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.2rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .level-intro p {
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: rgba(254,252,249,0.8);
+  }
+
+  /* ── RESULTS SCREEN ── */
+  .results-screen {
+    display: none;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .results-header {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    background: var(--navy);
+    color: var(--white);
+    border-radius: 10px;
+    margin-bottom: 2rem;
+  }
+
+  .results-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .results-header p {
+    font-size: 0.9rem;
+    color: rgba(254,252,249,0.65);
+  }
+
+  .result-section {
+    margin-bottom: 2rem;
+  }
+
+  .result-section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.25rem;
+    color: var(--navy);
+    margin-bottom: 0.3rem;
+  }
+
+  .result-section-sub {
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    margin-bottom: 1rem;
+  }
+
+  /* Bias gauge */
+  .bias-card {
+    background: var(--white);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .bias-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+  }
+
+  .bias-dim-label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--navy);
+  }
+
+  .bias-score-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+  }
+
+  .badge-green { background: #d5e8d0; color: #3c6b3a; }
+  .badge-amber { background: #f5e6c8; color: #8b6914; }
+  .badge-red { background: #f0d0ca; color: #8b3a2a; }
+
+  .bias-bar-track {
+    height: 6px;
+    background: var(--sand-dark);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+  }
+
+  .bias-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.8s ease;
+  }
+
+  .bias-commentary {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--warm-gray);
+  }
+
+  /* Level 2 results */
+  .posture-card {
+    background: var(--white);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .posture-label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--navy);
+    margin-bottom: 0.4rem;
+  }
+
+  .posture-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+    margin-bottom: 0.6rem;
+  }
+
+  .tag-reattiva { background: #f0d0ca; color: #8b3a2a; }
+  .tag-relazionale { background: #f5e6c8; color: #8b6914; }
+  .tag-riflessiva { background: #d5e8d0; color: #3c6b3a; }
+
+  .posture-text {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--warm-gray);
+  }
+
+  /* Profile narrative */
+  .profile-narrative {
+    background: var(--white);
+    border-left: 3px solid var(--teal);
+    border-radius: 0 8px 8px 0;
+    padding: 1.5rem;
+    font-size: 0.92rem;
+    line-height: 1.75;
+    color: var(--charcoal);
+  }
+
+  .profile-narrative strong {
+    color: var(--navy);
+  }
+
+  /* Detail cards */
+  .detail-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .detail-cell {
+    padding: 0.5rem 0.75rem;
+    background: var(--sand);
+    border-radius: 4px;
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+
+  .detail-cell .q-label {
+    font-weight: 600;
+    color: var(--navy);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* Print-friendly */
+  .btn-print {
+    display: block;
+    margin: 2rem auto 0;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    background: var(--teal);
+    color: var(--white);
+    border: 1.5px solid var(--teal);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-print:hover { background: var(--teal-light); border-color: var(--teal-light); }
+
+  .btn-restart {
+    display: block;
+    margin: 1rem auto 0;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.5rem 1.5rem;
+    background: transparent;
+    color: var(--warm-gray);
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @media print {
+    .btn-print, .btn-restart { display: none; }
+    .results-screen { display: block !important; }
+    .intro-screen, .test-container { display: none !important; }
+  }
+
+  @media (max-width: 600px) {
+    .intro-meta { flex-direction: column; gap: 1rem; }
+    .detail-row { grid-template-columns: 1fr; }
+    .nav-row { flex-direction: column; }
+    .btn-nav { width: 100%; text-align: center; }
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ════════ INTRO ════════ -->
+<div class="intro-screen" id="introScreen">
+  <div class="intro-label">People Design · Igiene Manageriale</div>
+  <h1 class="intro-title">Igiene Manageriale</h1>
+  <p class="intro-subtitle">La competenza di non demotivare</p>
+  <p class="intro-desc">
+    Questo test ti aiuterà a scoprire come il tuo comportamento manageriale
+    impatta sulla motivazione di chi lavora con te. Non ci sono risposte giuste o sbagliate:
+    lo strumento funziona solo se rispondi con onestà, descrivendo cosa faresti
+    <em>realmente</em> — non cosa sarebbe "giusto" fare.
+  </p>
+  <div class="intro-meta">
+    <div class="intro-meta-item">
+      <div class="num">21</div>
+      <div class="label">Scenari</div>
+    </div>
+    <div class="intro-meta-item">
+      <div class="num">15</div>
+      <div class="label">Minuti</div>
+    </div>
+    <div class="intro-meta-item">
+      <div class="num">3</div>
+      <div class="label">Dimensioni SDT</div>
+    </div>
+  </div>
+  <button class="btn-start" onclick="startTest()">Inizia il test</button>
+</div>
+
+<!-- ════════ TEST ════════ -->
+<div class="test-container" id="testContainer">
+  <div class="progress-bar-wrap">
+    <div class="progress-info">
+      <span class="progress-section" id="progressSection">Autonomia</span>
+      <span class="progress-count" id="progressCount">1 / 21</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <div id="scenariosWrap"></div>
+
+  <div class="nav-row">
+    <button class="btn-nav btn-prev" id="btnPrev" onclick="prevScenario()">← Indietro</button>
+    <button class="btn-nav btn-next" id="btnNext" onclick="nextScenario()" disabled>Avanti →</button>
+  </div>
+</div>
+
+<!-- ════════ RESULTS ════════ -->
+<div class="results-screen" id="resultsScreen"></div>
+
+<script>
+// ═══════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════
+
+const scenarios = [
+  // ── LIVELLO 1: AUTONOMIA ──
+  {
+    id: "1a", dim: "autonomia", level: 1, pair: "1", version: "A",
+    title: "Scenario 1 — La proposta di miglioramento",
+    versionLabel: "Versione A — Fase positiva",
+    text: "Il tuo collaboratore sta attraversando un ottimo periodo: è propositivo, puntuale, preciso. Durante una riunione operativa ti propone di cambiare il modo in cui viene gestita un'attività ricorrente. Secondo lui il processo attuale è inefficiente e ha un'idea per migliorarlo.",
+    options: [
+      { letter: "a", text: "Gli dici che il processo è stato definito così per buone ragioni e non è il momento di cambiare.", score: 1 },
+      { letter: "b", text: "Gli chiedi di spiegarti nel dettaglio la sua proposta e, se regge, gli dai il via per testarla.", score: 4 },
+      { letter: "c", text: "Gli dici che è una buona idea ma che devi prima verificare con il tuo responsabile.", score: 2 },
+      { letter: "d", text: "Lo lasci procedere direttamente — in questo momento ti fidi del suo giudizio.", score: 3 }
+    ]
+  },
+  {
+    id: "1b", dim: "autonomia", level: 1, pair: "1", version: "B",
+    title: "Scenario 1 — La proposta di miglioramento",
+    versionLabel: "Versione B — Fase di calo",
+    text: "Stessa proposta, stesso processo. Ma il tuo collaboratore sta attraversando un periodo opaco: meno energia, qualche ritardo, un paio di dimenticanze nelle ultime settimane.",
+    options: [
+      { letter: "a", text: "Gli dici che il processo è stato definito così per buone ragioni e non è il momento di cambiare.", score: 1 },
+      { letter: "b", text: "Gli chiedi di spiegarti nel dettaglio la sua proposta e, se regge, gli dai il via per testarla.", score: 4 },
+      { letter: "c", text: "Gli dici che è una buona idea ma che devi prima verificare con il tuo responsabile.", score: 2 },
+      { letter: "d", text: "Lo lasci procedere direttamente — ti fidi del suo giudizio.", score: 3 }
+    ]
+  },
+  {
+    id: "2a", dim: "autonomia", level: 1, pair: "2", version: "A",
+    title: "Scenario 2 — Il cambio di priorità",
+    versionLabel: "Versione A — Fase positiva",
+    text: "Hai assegnato al tuo collaboratore un progetto che richiede concentrazione e che lui sta portando avanti con impegno da diversi giorni. Ricevi una richiesta urgente dal tuo responsabile che cambia completamente le priorità della settimana.",
+    options: [
+      { letter: "a", text: "Gli comunichi il cambio e gli dici di passare subito alla nuova priorità.", score: 2 },
+      { letter: "b", text: "Gli spieghi cosa è successo, riconosci il lavoro fatto, e concordate insieme come riorganizzare la settimana.", score: 4 },
+      { letter: "c", text: "Non gli dici nulla del cambio di priorità e gli assegni direttamente il nuovo compito.", score: 1 },
+      { letter: "d", text: "Gli chiedi di mettere in pausa il progetto e gli dici che ci tornerete — anche se non sai quando.", score: 2 }
+    ]
+  },
+  {
+    id: "2b", dim: "autonomia", level: 1, pair: "2", version: "B",
+    title: "Scenario 2 — Il cambio di priorità",
+    versionLabel: "Versione B — Fase di calo",
+    text: "Stesso progetto, stesso cambio di priorità dall'alto. Ma il tuo collaboratore, in questo periodo, ti sembra meno coinvolto e più lento del solito.",
+    options: [
+      { letter: "a", text: "Gli comunichi il cambio e gli dici di passare subito alla nuova priorità.", score: 2 },
+      { letter: "b", text: "Gli spieghi cosa è successo, riconosci il lavoro fatto, e concordate insieme come riorganizzare la settimana.", score: 4 },
+      { letter: "c", text: "Non gli dici nulla del cambio di priorità e gli assegni direttamente il nuovo compito.", score: 1 },
+      { letter: "d", text: "Gli chiedi di mettere in pausa il progetto e gli dici che ci tornerete — anche se non sai quando.", score: 2 }
+    ]
+  },
+  {
+    id: "3a", dim: "autonomia", level: 1, pair: "3", version: "A",
+    title: "Scenario 3 — La delega operativa",
+    versionLabel: "Versione A — Fase positiva",
+    text: "Devi organizzare un'attività che normalmente gestisci tu. Il tuo collaboratore, che in questo periodo è molto affidabile, ti chiede se può occuparsene lui, proponendoti un piano di lavoro.",
+    options: [
+      { letter: "a", text: "Apprezzi l'iniziativa ma gli dici che preferisci gestirla tu perché è un'attività delicata.", score: 2 },
+      { letter: "b", text: "Gli chiedi di inviarti il suo piano — lo usi come base e lo integri con le tue indicazioni.", score: 4 },
+      { letter: "c", text: "Accetti la proposta com'è — se il piano è solido, non serve il tuo intervento.", score: 3 },
+      { letter: "d", text: "Gli dici che non rientra nelle sue responsabilità.", score: 1 }
+    ]
+  },
+  {
+    id: "3b", dim: "autonomia", level: 1, pair: "3", version: "B",
+    title: "Scenario 3 — La delega operativa",
+    versionLabel: "Versione B — Fase di calo",
+    text: "Stessa richiesta, stesso piano. Ma il tuo collaboratore, in questo periodo, ha mostrato meno affidabilità nella gestione delle attività quotidiane.",
+    options: [
+      { letter: "a", text: "Apprezzi l'iniziativa ma gli dici che preferisci gestirla tu perché è un'attività delicata.", score: 2 },
+      { letter: "b", text: "Gli chiedi di inviarti il suo piano — lo usi come base e lo integri con le tue indicazioni.", score: 4 },
+      { letter: "c", text: "Accetti la proposta com'è — se il piano è solido, non serve il tuo intervento.", score: 3 },
+      { letter: "d", text: "Gli dici che non rientra nelle sue responsabilità.", score: 1 }
+    ]
+  },
+
+  // ── LIVELLO 1: COMPETENZA ──
+  {
+    id: "4a", dim: "competenza", level: 1, pair: "4", version: "A",
+    title: "Scenario 4 — Il feedback su un lavoro consegnato",
+    versionLabel: "Versione A — Fase positiva",
+    text: "Il tuo collaboratore ti ha consegnato un deliverable (un report, una presentazione, un'analisi). Il risultato complessivo è buono, ma ci sono un paio di aspetti che avresti impostato diversamente.",
+    options: [
+      { letter: "a", text: "Non dici nulla — il risultato è buono, non serve intervenire.", score: 2 },
+      { letter: "b", text: "Lo ringrazi per il lavoro e poi gli indichi con precisione i due aspetti che cambieresti, spiegando perché.", score: 4 },
+      { letter: "c", text: "Correggi direttamente le due cose senza dirgli nulla — fai prima.", score: 1 },
+      { letter: "d", text: "Gli dici \"bene, ma la prossima volta fammi vedere una bozza prima di finalizzare.\"", score: 2 }
+    ]
+  },
+  {
+    id: "4b", dim: "competenza", level: 1, pair: "4", version: "B",
+    title: "Scenario 4 — Il feedback su un lavoro consegnato",
+    versionLabel: "Versione B — Fase di calo",
+    text: "Stesso deliverable, stesso livello qualitativo oggettivo. Ma il tuo collaboratore sta attraversando una fase in cui ti sembra meno accurato del solito.",
+    options: [
+      { letter: "a", text: "Non dici nulla — il risultato è buono, non serve intervenire.", score: 2 },
+      { letter: "b", text: "Lo ringrazi per il lavoro e poi gli indichi con precisione i due aspetti che cambieresti, spiegando perché.", score: 4 },
+      { letter: "c", text: "Correggi direttamente le due cose senza dirgli nulla — fai prima.", score: 1 },
+      { letter: "d", text: "Gli dici \"bene, ma la prossima volta fammi vedere una bozza prima di finalizzare.\"", score: 2 }
+    ]
+  },
+  {
+    id: "5a", dim: "competenza", level: 1, pair: "5", version: "A",
+    title: "Scenario 5 — La difficoltà su uno strumento nuovo",
+    versionLabel: "Versione A — Fase positiva",
+    text: "Il tuo collaboratore è in difficoltà con un nuovo strumento di lavoro (un software, un processo, una procedura). Ti ha chiesto aiuto due volte nell'ultima settimana. La terza volta viene da te di nuovo.",
+    options: [
+      { letter: "a", text: "Gli spieghi la procedura una terza volta con pazienza.", score: 3 },
+      { letter: "b", text: "Gli proponi di sedervi insieme 15 minuti per capire esattamente dove si blocca e creare una guida che possa usare in autonomia.", score: 4 },
+      { letter: "c", text: "Gli dici che a questo punto dovrebbe averlo imparato e che non puoi spiegargli le cose all'infinito.", score: 1 },
+      { letter: "d", text: "Fai tu l'operazione al posto suo — è più veloce.", score: 1 }
+    ]
+  },
+  {
+    id: "5b", dim: "competenza", level: 1, pair: "5", version: "B",
+    title: "Scenario 5 — La difficoltà su uno strumento nuovo",
+    versionLabel: "Versione B — Fase di calo",
+    text: "Stessa difficoltà, stessa richiesta per la terza volta. Ma il tuo collaboratore, in questo periodo, ti sembra generalmente più lento e meno ricettivo.",
+    options: [
+      { letter: "a", text: "Gli spieghi la procedura una terza volta con pazienza.", score: 3 },
+      { letter: "b", text: "Gli proponi di sedervi insieme 15 minuti per capire esattamente dove si blocca e creare una guida che possa usare in autonomia.", score: 4 },
+      { letter: "c", text: "Gli dici che a questo punto dovrebbe averlo imparato e che non puoi spiegargli le cose all'infinito.", score: 1 },
+      { letter: "d", text: "Fai tu l'operazione al posto suo — è più veloce.", score: 1 }
+    ]
+  },
+  {
+    id: "6a", dim: "competenza", level: 1, pair: "6", version: "A",
+    title: "Scenario 6 — Gli obiettivi",
+    versionLabel: "Versione A — Fase positiva",
+    text: "Presenti al tuo collaboratore gli obiettivi del prossimo periodo. Lui ti chiede chiarimenti: non capisce come i suoi obiettivi individuali si colleghino alla strategia più ampia del dipartimento.",
+    options: [
+      { letter: "a", text: "Gli rispondi che gli obiettivi sono quelli, sono stati definiti dalla direzione e vanno raggiunti.", score: 1 },
+      { letter: "b", text: "Ti prendi il tempo per spiegargli la logica: come si costruisce il target, da dove viene il suo numero, cosa può controllare direttamente.", score: 4 },
+      { letter: "c", text: "Gli dici che ne parlate dopo, quando riesci a trovare un momento.", score: 2 },
+      { letter: "d", text: "Gli dici di chiedere a un collega che ha più esperienza.", score: 2 }
+    ]
+  },
+  {
+    id: "6b", dim: "competenza", level: 1, pair: "6", version: "B",
+    title: "Scenario 6 — Gli obiettivi",
+    versionLabel: "Versione B — Fase di calo",
+    text: "Stessa domanda. Ma il tuo collaboratore, negli ultimi mesi, non ha raggiunto buona parte dei suoi obiettivi.",
+    options: [
+      { letter: "a", text: "Gli rispondi che gli obiettivi sono quelli, sono stati definiti dalla direzione e vanno raggiunti.", score: 1 },
+      { letter: "b", text: "Ti prendi il tempo per spiegargli la logica: come si costruisce il target, da dove viene il suo numero, cosa può controllare direttamente.", score: 4 },
+      { letter: "c", text: "Gli dici che ne parlate dopo, quando riesci a trovare un momento.", score: 2 },
+      { letter: "d", text: "Gli dici di chiedere a un collega che ha più esperienza.", score: 2 }
+    ]
+  },
+
+  // ── LIVELLO 1: RELAZIONE ──
+  {
+    id: "7a", dim: "relazione", level: 1, pair: "7", version: "A",
+    title: "Scenario 7 — Il riconoscimento",
+    versionLabel: "Versione A — Fase positiva",
+    text: "Il tuo collaboratore ha gestito molto bene una situazione complessa — un problema con un cliente interno, un'emergenza operativa, una scadenza critica. Hai assistito direttamente alla sua gestione.",
+    options: [
+      { letter: "a", text: "Non dici nulla — ha fatto il suo lavoro, è quello che ci si aspetta.", score: 1 },
+      { letter: "b", text: "Lo ringrazi in privato subito dopo.", score: 3 },
+      { letter: "c", text: "Lo citi positivamente nella prossima riunione di team o nel prossimo aggiornamento al tuo responsabile.", score: 4 },
+      { letter: "d", text: "Gli mandi un messaggio scritto di apprezzamento.", score: 3 }
+    ]
+  },
+  {
+    id: "7b", dim: "relazione", level: 1, pair: "7", version: "B",
+    title: "Scenario 7 — Il riconoscimento",
+    versionLabel: "Versione B — Fase di calo",
+    text: "Stessa situazione, gestita altrettanto bene. Ma il tuo collaboratore sta attraversando un periodo in cui ti sembra meno coinvolto. Oggettivamente, però, questa volta ha fatto un ottimo lavoro.",
+    options: [
+      { letter: "a", text: "Non dici nulla — ha fatto il suo lavoro, è quello che ci si aspetta.", score: 1 },
+      { letter: "b", text: "Lo ringrazi in privato subito dopo.", score: 3 },
+      { letter: "c", text: "Lo citi positivamente nella prossima riunione di team o nel prossimo aggiornamento al tuo responsabile.", score: 4 },
+      { letter: "d", text: "Gli mandi un messaggio scritto di apprezzamento.", score: 3 }
+    ]
+  },
+  {
+    id: "8a", dim: "relazione", level: 1, pair: "8", version: "A",
+    title: "Scenario 8 — La richiesta personale",
+    versionLabel: "Versione A — Fase positiva",
+    text: "Il tuo collaboratore ti chiede di spostare un impegno lavorativo per una ragione personale. Non ti dà dettagli. Lo spostamento è fattibile ma richiede un piccolo riadattamento dell'organizzazione.",
+    options: [
+      { letter: "a", text: "Gli dici di sì senza chiedere spiegazioni — se lo merita.", score: 3 },
+      { letter: "b", text: "Gli dici di sì e gli chiedi se è tutto ok — ti interessa sapere come sta.", score: 4 },
+      { letter: "c", text: "Gli dici che devi verificare la fattibilità e gli rispondi dopo.", score: 2 },
+      { letter: "d", text: "Gli dici di sì ma gli fai capire che è un'eccezione.", score: 1 }
+    ]
+  },
+  {
+    id: "8b", dim: "relazione", level: 1, pair: "8", version: "B",
+    title: "Scenario 8 — La richiesta personale",
+    versionLabel: "Versione B — Fase di calo",
+    text: "Stessa richiesta. Ma il tuo collaboratore sta attraversando un periodo in cui ti sembra svogliato. Lo spostamento è ugualmente fattibile.",
+    options: [
+      { letter: "a", text: "Gli dici di sì senza chiedere spiegazioni.", score: 3 },
+      { letter: "b", text: "Gli dici di sì e gli chiedi se è tutto ok.", score: 4 },
+      { letter: "c", text: "Gli dici che devi verificare la fattibilità e gli rispondi dopo.", score: 2 },
+      { letter: "d", text: "Gli dici di sì ma gli fai capire che è un'eccezione.", score: 1 }
+    ]
+  },
+  {
+    id: "9a", dim: "relazione", level: 1, pair: "9", version: "A",
+    title: "Scenario 9 — La tensione con un collega",
+    versionLabel: "Versione A — Fase positiva",
+    text: "Il tuo collaboratore viene da te e ti segnala un problema con un collega di un altro team: non riceve le informazioni che gli servono per lavorare, e questo lo sta rallentando. È visibilmente frustrato.",
+    options: [
+      { letter: "a", text: "Gli dici che hai capito e che parlerai tu direttamente con il collega o il suo responsabile.", score: 2 },
+      { letter: "b", text: "Lo ascolti, gli chiedi cosa ha osservato concretamente, e ragionate insieme su come gestire la situazione.", score: 4 },
+      { letter: "c", text: "Gli dici di non preoccuparsi, che \"queste cose si risolvono da sole.\"", score: 1 },
+      { letter: "d", text: "Gli dici che deve imparare a gestire direttamente i rapporti con i colleghi.", score: 2 }
+    ]
+  },
+  {
+    id: "9b", dim: "relazione", level: 1, pair: "9", version: "B",
+    title: "Scenario 9 — La tensione con un collega",
+    versionLabel: "Versione B — Fase di calo",
+    text: "Stessa segnalazione, stessa frustrazione. Ma il tuo collaboratore sta attraversando un periodo in cui ti sembra meno proattivo e più tendente a lamentarsi.",
+    options: [
+      { letter: "a", text: "Gli dici che hai capito e che parlerai tu direttamente con il collega o il suo responsabile.", score: 2 },
+      { letter: "b", text: "Lo ascolti, gli chiedi cosa ha osservato concretamente, e ragionate insieme su come gestire la situazione.", score: 4 },
+      { letter: "c", text: "Gli dici di non preoccuparsi, che \"queste cose si risolvono da sole.\"", score: 1 },
+      { letter: "d", text: "Gli dici che deve imparare a gestire direttamente i rapporti con i colleghi.", score: 2 }
+    ]
+  },
+
+  // ── LIVELLO 2: CAMBIAMENTO ──
+  {
+    id: "10", dim: "cambiamento", level: 2, subdim: "autonomia",
+    title: "Scenario 10 — Il calo di iniziativa",
+    versionLabel: "Autonomia — Reazione al cambiamento",
+    text: "Il tuo collaboratore fino a qualche mese fa era propositivo e autonomo — portava avanti il lavoro senza bisogno di supervisione, proponeva miglioramenti, si offriva per attività extra. Da qualche settimana si limita a fare lo stretto necessario. Non crea problemi, ma non propone più nulla. Esegue e basta.",
+    options: [
+      { letter: "a", text: "Non intervieni — finché fa il suo lavoro, non c'è un problema reale.", posture: "reattiva" },
+      { letter: "b", text: "Gli chiedi direttamente: \"Ho notato che sei meno propositivo di prima, è cambiato qualcosa?\"", posture: "relazionale" },
+      { letter: "c", text: "Gli assegni più responsabilità per stimolarlo — forse ha bisogno di nuove sfide.", posture: "reattiva" },
+      { letter: "d", text: "Ne parli con il tuo responsabile o con l'HR perché ti chiedi se stia cercando un altro lavoro.", posture: "reattiva" },
+      { letter: "e", text: "Rifletti prima su cosa è cambiato anche dal tuo lato: gli hai ridotto spazi, cambiato il modo di delegare, dato meno attenzione?", posture: "riflessiva" }
+    ]
+  },
+  {
+    id: "11", dim: "cambiamento", level: 2, subdim: "competenza",
+    title: "Scenario 11 — Il calo di qualità",
+    versionLabel: "Competenza — Reazione al cambiamento",
+    text: "Il tuo collaboratore è sempre stato preciso e affidabile. Nell'ultimo mese, però, ha iniziato a fare errori che prima non faceva. Niente di grave, ma il pattern è chiaro: distrazione, imprecisione, qualcosa che non torna.",
+    options: [
+      { letter: "a", text: "Gli fai notare gli errori uno per uno e gli chiedi di prestare più attenzione.", posture: "reattiva" },
+      { letter: "b", text: "Aspetti di vedere se la situazione si normalizza da sola.", posture: "reattiva" },
+      { letter: "c", text: "Lo convochi per un confronto e gli chiedi cosa sta succedendo — professionalmente o personalmente.", posture: "relazionale" },
+      { letter: "d", text: "Gli riduci le responsabilità: meglio dargli compiti più semplici finché non torna in forma.", posture: "reattiva" },
+      { letter: "e", text: "Ti chiedi se è cambiato qualcosa nel suo contesto lavorativo: nuovo carico, meno supporto, strumenti inadeguati?", posture: "riflessiva" }
+    ]
+  },
+  {
+    id: "12", dim: "cambiamento", level: 2, subdim: "relazione",
+    title: "Scenario 12 — Il ritiro relazionale",
+    versionLabel: "Relazione — Reazione al cambiamento",
+    text: "Il tuo collaboratore era una persona aperta, collaborativa, disponibile. Da qualche settimana è diventato più chiuso. Partecipa meno alle riunioni, comunica il minimo indispensabile, sembra distante.",
+    options: [
+      { letter: "a", text: "Rispetti il suo spazio — ognuno ha i suoi momenti, non devi per forza intervenire.", posture: "reattiva" },
+      { letter: "b", text: "Lo prendi da parte in un momento tranquillo e gli chiedi come sta, senza pressarlo.", posture: "relazionale" },
+      { letter: "c", text: "Gli dici esplicitamente che noti un cambiamento e che il team ha bisogno del suo contributo.", posture: "reattiva" },
+      { letter: "d", text: "Lo segnali all'HR perché potrebbe avere un problema personale.", posture: "reattiva" },
+      { letter: "e", text: "Ti domandi se qualcosa nel vostro rapporto è cambiato: un feedback dato male, una promessa non mantenuta, un riconoscimento mancato?", posture: "riflessiva" }
+    ]
+  }
+];
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let currentIdx = 0;
+const answers = {};
+
+// ═══════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════
+function buildScenarios() {
+  const wrap = document.getElementById('scenariosWrap');
+  wrap.innerHTML = '';
+
+  scenarios.forEach((sc, i) => {
+    const dimClass = sc.dim === 'cambiamento' ? 'dim-cambiamento' : `dim-${sc.dim}`;
+    const dimLabel = sc.level === 2 ? 'Cambiamento' : sc.dim.charAt(0).toUpperCase() + sc.dim.slice(1);
+
+    let levelIntro = '';
+    if (i === 18) { // first Level 2 scenario
+      levelIntro = `
+        <div class="level-intro">
+          <h3>Livello 2 — Scenari di cambiamento</h3>
+          <p>In questi scenari, il collaboratore è qualcuno che fino a poco tempo fa funzionava bene, ma che ha cambiato comportamento. Non sai perché. Rispondi con quello che faresti davvero.</p>
+        </div>`;
+    }
+
+    const optionsHtml = sc.options.map(o => `
+      <li class="option-item" data-scenario="${sc.id}" data-letter="${o.letter}" onclick="selectOption('${sc.id}','${o.letter}')">
+        <span class="option-letter">${o.letter}</span>
+        ${o.text}
+      </li>`).join('');
+
+    wrap.innerHTML += `
+      <div class="scenario-block" id="scenario-${i}" ${i === 0 ? 'class="scenario-block active"' : ''}>
+        ${levelIntro}
+        <span class="scenario-dimension ${dimClass}">${sc.level === 1 ? 'Livello 1 · ' : 'Livello 2 · '}${dimLabel}</span>
+        <h2 class="scenario-title">${sc.title}</h2>
+        <p class="scenario-version">${sc.versionLabel}</p>
+        <div class="scenario-text">${sc.text}</div>
+        <ul class="options-list">${optionsHtml}</ul>
+      </div>`;
+  });
+
+  // Fix: set first one active properly
+  document.getElementById('scenario-0').classList.add('active');
+  updateUI();
+}
+
+function selectOption(scenarioId, letter) {
+  answers[scenarioId] = letter;
+  // update visual
+  document.querySelectorAll(`[data-scenario="${scenarioId}"]`).forEach(el => {
+    el.classList.toggle('selected', el.dataset.letter === letter);
+  });
+  updateUI();
+}
+
+function updateUI() {
+  const total = scenarios.length;
+  const pct = ((currentIdx + 1) / total) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressCount').textContent = `${currentIdx + 1} / ${total}`;
+
+  const sc = scenarios[currentIdx];
+  const dimLabel = sc.level === 2 ? 'Cambiamento' : sc.dim.charAt(0).toUpperCase() + sc.dim.slice(1);
+  document.getElementById('progressSection').textContent = `Livello ${sc.level} · ${dimLabel}`;
+
+  document.getElementById('btnPrev').style.visibility = currentIdx === 0 ? 'hidden' : 'visible';
+
+  const btnNext = document.getElementById('btnNext');
+  const hasAnswer = !!answers[sc.id];
+
+  if (currentIdx === total - 1) {
+    btnNext.textContent = 'Scopri il tuo profilo →';
+    btnNext.className = 'btn-nav btn-next btn-results';
+    btnNext.disabled = !hasAnswer;
+    btnNext.onclick = showResults;
+  } else {
+    btnNext.textContent = 'Avanti →';
+    btnNext.className = 'btn-nav btn-next';
+    btnNext.disabled = !hasAnswer;
+    btnNext.onclick = nextScenario;
+  }
+}
+
+function nextScenario() {
+  if (currentIdx >= scenarios.length - 1) return;
+  document.getElementById(`scenario-${currentIdx}`).classList.remove('active');
+  currentIdx++;
+  document.getElementById(`scenario-${currentIdx}`).classList.add('active');
+  updateUI();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function prevScenario() {
+  if (currentIdx <= 0) return;
+  document.getElementById(`scenario-${currentIdx}`).classList.remove('active');
+  currentIdx--;
+  document.getElementById(`scenario-${currentIdx}`).classList.add('active');
+  updateUI();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function startTest() {
+  document.getElementById('introScreen').style.display = 'none';
+  document.getElementById('testContainer').style.display = 'block';
+  buildScenarios();
+}
+
+// ═══════════════════════════════════════════
+// SCORING & RESULTS
+// ═══════════════════════════════════════════
+
+function computeResults() {
+  const dims = ['autonomia', 'competenza', 'relazione'];
+  const biasResults = {};
+
+  dims.forEach(dim => {
+    const pairs = [...new Set(scenarios.filter(s => s.level === 1 && s.dim === dim).map(s => s.pair))];
+    let totalGap = 0;
+    let gapCount = 0;
+    const pairDetails = [];
+
+    pairs.forEach(p => {
+      const scA = scenarios.find(s => s.pair === p && s.version === 'A');
+      const scB = scenarios.find(s => s.pair === p && s.version === 'B');
+      const ansA = answers[scA.id];
+      const ansB = answers[scB.id];
+      const scoreA = scA.options.find(o => o.letter === ansA)?.score || 0;
+      const scoreB = scB.options.find(o => o.letter === ansB)?.score || 0;
+      const gap = ansA !== ansB ? 1 : 0;
+      totalGap += gap;
+      gapCount++;
+      pairDetails.push({ pair: p, ansA, ansB, scoreA, scoreB, gap, title: scA.title });
+    });
+
+    const biasPercent = Math.round((totalGap / gapCount) * 100);
+    biasResults[dim] = { totalGap, gapCount, biasPercent, pairDetails };
+  });
+
+  // Level 2
+  const l2scenarios = scenarios.filter(s => s.level === 2);
+  const postureResults = [];
+  let reflexiveCount = 0;
+
+  l2scenarios.forEach(sc => {
+    const ans = answers[sc.id];
+    const chosen = sc.options.find(o => o.letter === ans);
+    if (chosen?.posture === 'riflessiva') reflexiveCount++;
+    postureResults.push({
+      id: sc.id,
+      subdim: sc.subdim,
+      title: sc.title,
+      posture: chosen?.posture || 'reattiva',
+      chosenText: chosen?.text || ''
+    });
+  });
+
+  return { biasResults, postureResults, reflexiveCount };
+}
+
+function getBiasLevel(pct) {
+  if (pct <= 33) return { label: 'Coerente', badge: 'badge-green', color: '#5a8a6a' };
+  if (pct <= 66) return { label: 'Attenzione', badge: 'badge-amber', color: '#d4a04a' };
+  return { label: 'Critico', badge: 'badge-red', color: '#b85042' };
+}
+
+function getPostureLabel(p) {
+  if (p === 'riflessiva') return { label: 'Riflessiva', tag: 'tag-riflessiva' };
+  if (p === 'relazionale') return { label: 'Relazionale', tag: 'tag-relazionale' };
+  return { label: 'Reattiva', tag: 'tag-reattiva' };
+}
+
+function buildNarrative(results) {
+  const { biasResults, postureResults, reflexiveCount } = results;
+  const dims = ['autonomia', 'competenza', 'relazione'];
+  const dimNames = { autonomia: 'autonomia', competenza: 'competenza', relazione: 'relazione' };
+
+  // Find highest and lowest bias
+  let highBias = null, lowBias = null;
+  dims.forEach(d => {
+    const bp = biasResults[d].biasPercent;
+    if (!highBias || bp > biasResults[highBias].biasPercent) highBias = d;
+    if (!lowBias || bp < biasResults[lowBias].biasPercent) lowBias = d;
+  });
+
+  let narrative = '';
+
+  // Bias section
+  if (biasResults[highBias].biasPercent === 0 && biasResults[lowBias].biasPercent === 0) {
+    narrative += `<strong>Coerenza di trattamento:</strong> Le tue risposte mostrano un comportamento molto coerente — tratti i collaboratori allo stesso modo indipendentemente dalla percezione che hai di loro. È un risultato significativo e raro.`;
+  } else if (biasResults[highBias].biasPercent <= 33) {
+    narrative += `<strong>Coerenza di trattamento:</strong> Il tuo livello di coerenza è buono. Mostri qualche variazione minore tra come ti comporti nella fase positiva e nella fase di calo del tuo collaboratore, ma il gap è contenuto. Fai attenzione a mantenerlo così.`;
+  } else {
+    const highName = dimNames[highBias];
+    const lowName = dimNames[lowBias];
+    if (highBias === lowBias || biasResults[lowBias].biasPercent > 33) {
+      narrative += `<strong>Coerenza di trattamento:</strong> Le tue risposte mostrano un gap significativo tra come ti comporti quando il tuo collaboratore è in una fase positiva e quando è in una fase di calo, in modo trasversale su tutte le dimensioni. Questo è il pattern più rischioso: nella fase di calo il tuo collaboratore riceve meno spazio, meno feedback costruttivo e meno riconoscimento — esattamente le cose che gli servirebbero per ripartire.`;
+    } else {
+      narrative += `<strong>Coerenza di trattamento:</strong> Nelle situazioni legate alla <strong>${highName}</strong>, tendi a comportarti in modo significativamente diverso quando il tuo collaboratore è in fase positiva rispetto a quando è in fase di calo. Sul piano della <strong>${lowName}</strong> sei più coerente. Il rischio è che nella fase di calo, offrendo meno ${highName === 'autonomia' ? 'spazi di iniziativa' : highName === 'competenza' ? 'feedback costruttivo' : 'riconoscimento'}, tu contribuisca a trasformare un calo temporaneo in una demotivazione strutturale.`;
+    }
+  }
+
+  narrative += '<br><br>';
+
+  // Posture section
+  const postureMap = { reattiva: 0, relazionale: 0, riflessiva: 0 };
+  postureResults.forEach(p => postureMap[p.posture]++);
+  const dominant = Object.entries(postureMap).sort((a,b) => b[1]-a[1])[0][0];
+
+  if (dominant === 'riflessiva') {
+    narrative += `<strong>Reazione al cambiamento:</strong> Di fronte a un collaboratore che cambia comportamento, il tuo primo istinto è chiederti se qualcosa è cambiato anche dal tuo lato. È il livello più maturo di igiene manageriale: la capacità di leggere la demotivazione dell'altro come un possibile effetto delle proprie azioni.`;
+  } else if (dominant === 'relazionale') {
+    narrative += `<strong>Reazione al cambiamento:</strong> Di fronte a un collaboratore che cambia, cerchi il dialogo — vuoi capire cosa è successo. È un buon riflesso, necessario ma non sufficiente. Il passo ulteriore sarebbe chiederti, prima di parlare con il collaboratore, se il cambiamento possa essere una risposta al tuo comportamento manageriale.`;
+  } else {
+    narrative += `<strong>Reazione al cambiamento:</strong> Di fronte a un collaboratore che cambia comportamento, il tuo primo istinto è agire sul sintomo — correggere, segnalare, ridurre le responsabilità. Questo approccio rischia di non intercettare la causa reale, che potrebbe risiedere nel contesto lavorativo o nel tuo stesso stile manageriale.`;
+  }
+
+  narrative += '<br><br>';
+
+  // Reflexive
+  if (reflexiveCount === 3) {
+    narrative += `<strong>Autoconsapevolezza:</strong> Hai scelto la postura riflessiva in tutti e tre gli scenari di cambiamento. Questo indica una forte capacità di autocritica manageriale — sai che il comportamento dei tuoi collaboratori può essere un riflesso del tuo.`;
+  } else if (reflexiveCount >= 1) {
+    narrative += `<strong>Autoconsapevolezza:</strong> Hai scelto la postura riflessiva in ${reflexiveCount} scenario${reflexiveCount > 1 ? 'i' : ''} su 3. L'autoconsapevolezza è presente ma non è ancora il tuo riflesso dominante. L'igiene manageriale matura passa dalla capacità di chiedersi sistematicamente: "E se il problema fossi anche io?"`;
+  } else {
+    narrative += `<strong>Autoconsapevolezza:</strong> In nessuno dei tre scenari di cambiamento hai scelto la postura riflessiva. Questo non significa che non sei capace di autocritica, ma che nel momento della reazione il tuo primo impulso non è chiederti cosa è cambiato dal tuo lato. È il punto su cui lavorare con più attenzione.`;
+  }
+
+  return narrative;
+}
+
+function showResults() {
+  const results = computeResults();
+  const { biasResults, postureResults } = results;
+  const dims = ['autonomia', 'competenza', 'relazione'];
+  const dimLabels = { autonomia: 'Autonomia', competenza: 'Competenza', relazione: 'Relazione' };
+  const dimSubLabels = {
+    autonomia: 'Quanto spazio lasci, quando?',
+    competenza: 'Come dai feedback, quando?',
+    relazione: 'Quanto riconosci, quando?'
+  };
+
+  let html = `
+    <div class="results-header">
+      <h2>Il tuo profilo di Igiene Manageriale</h2>
+      <p>Basato sulle tue risposte a 21 scenari manageriali</p>
+    </div>`;
+
+  // ── NARRATIVE PROFILE ──
+  html += `
+    <div class="result-section">
+      <h3 class="result-section-title">Profilo restituivo</h3>
+      <p class="result-section-sub">La sintesi del tuo stile manageriale</p>
+      <div class="profile-narrative">${buildNarrative(results)}</div>
+    </div>`;
+
+  // ── BIAS DETAIL ──
+  html += `
+    <div class="result-section">
+      <h3 class="result-section-title">Bias differenziale</h3>
+      <p class="result-section-sub">Quanto cambia il tuo comportamento tra fase positiva e fase di calo</p>`;
+
+  dims.forEach(dim => {
+    const b = biasResults[dim];
+    const level = getBiasLevel(b.biasPercent);
+
+    let commentary = '';
+    if (b.biasPercent === 0) {
+      commentary = `Nessun gap rilevato: le tue risposte sono identiche nella fase positiva e nella fase di calo.`;
+    } else if (b.biasPercent <= 33) {
+      commentary = `Gap contenuto: qualche variazione ma il trattamento è sostanzialmente coerente.`;
+    } else if (b.biasPercent <= 66) {
+      commentary = `Gap moderato: in alcune situazioni il tuo comportamento cambia significativamente.`;
+    } else {
+      commentary = `Gap elevato: il tuo trattamento cambia in modo sistematico. Rischio di circolo vizioso.`;
+    }
+
+    const detailHtml = b.pairDetails.map(pd => `
+      <div class="detail-row">
+        <div class="detail-cell">
+          <span class="q-label">Fase positiva</span><br>Risposta: ${pd.ansA.toUpperCase()}
+        </div>
+        <div class="detail-cell">
+          <span class="q-label">Fase di calo</span><br>Risposta: ${pd.ansB.toUpperCase()} ${pd.gap ? '⚠️ diversa' : '✓ uguale'}
+        </div>
+      </div>`).join('');
+
+    html += `
+      <div class="bias-card">
+        <div class="bias-card-header">
+          <span class="bias-dim-label">${dimLabels[dim]} — ${dimSubLabels[dim]}</span>
+          <span class="bias-score-badge ${level.badge}">${level.label}</span>
+        </div>
+        <div class="bias-bar-track">
+          <div class="bias-bar-fill" style="width: ${b.biasPercent}%; background: ${level.color};"></div>
+        </div>
+        <p class="bias-commentary">${commentary}</p>
+        ${detailHtml}
+      </div>`;
+  });
+  html += '</div>';
+
+  // ── LEVEL 2 POSTURE ──
+  html += `
+    <div class="result-section">
+      <h3 class="result-section-title">Reazione al cambiamento</h3>
+      <p class="result-section-sub">Come reagisci quando un collaboratore che funzionava bene cambia comportamento</p>`;
+
+  const subdimLabels = { autonomia: 'Calo di iniziativa', competenza: 'Calo di qualità', relazione: 'Ritiro relazionale' };
+  const postureDescs = {
+    reattiva: 'Agisci sul sintomo senza chiederti perché il cambiamento è avvenuto.',
+    relazionale: 'Cerchi il dialogo con il collaboratore per capire cosa è successo.',
+    riflessiva: 'Ti chiedi prima se il cambiamento possa essere una risposta al tuo comportamento.'
+  };
+
+  postureResults.forEach(pr => {
+    const pl = getPostureLabel(pr.posture);
+    html += `
+      <div class="posture-card">
+        <p class="posture-label">${subdimLabels[pr.subdim]}</p>
+        <span class="posture-tag ${pl.tag}">${pl.label}</span>
+        <p class="posture-text">${postureDescs[pr.posture]}</p>
+      </div>`;
+  });
+
+  html += '</div>';
+
+  // ── ACTIONS ──
+  html += `
+    <button class="btn-print" onclick="downloadPDF()">Scarica profilo PDF</button>
+    <button class="btn-restart" onclick="location.reload()">Rifai il test</button>`;
+
+  document.getElementById('testContainer').style.display = 'none';
+  const resultsEl = document.getElementById('resultsScreen');
+  resultsEl.innerHTML = html;
+  resultsEl.style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Animate bars
+  setTimeout(() => {
+    document.querySelectorAll('.bias-bar-fill').forEach(bar => {
+      bar.style.width = bar.style.width; // trigger reflow
+    });
+  }, 100);
+}
+
+async function downloadPDF() {
+  const el = document.getElementById('resultsScreen');
+  const buttons = el.querySelectorAll('.btn-print, .btn-restart');
+  buttons.forEach(b => b.style.display = 'none');
+
+  // Force a fixed width for consistent rendering
+  const origMaxWidth = el.style.maxWidth;
+  const origMargin = el.style.margin;
+  el.style.maxWidth = '780px';
+  el.style.margin = '0 auto';
+
+  try {
+    const canvas = await html2canvas(el, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#f5f0e8',
+      scrollY: -window.scrollY,
+      windowWidth: 820,
+      width: 780,
+      height: el.scrollHeight
+    });
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'a4');
+
+    const pageW = 210;  // A4 width mm
+    const pageH = 297;  // A4 height mm
+    const margin = 10;
+    const contentW = pageW - margin * 2;
+    const contentH = pageH - margin * 2;
+
+    const imgW = canvas.width;
+    const imgH = canvas.height;
+    const ratio = contentW / imgW;
+    const scaledH = imgH * ratio;
+
+    // How many pages needed
+    const totalPages = Math.ceil(scaledH / contentH);
+
+    for (let i = 0; i < totalPages; i++) {
+      if (i > 0) pdf.addPage();
+
+      // Source crop from canvas
+      const srcY = (i * contentH / ratio);
+      const srcH = Math.min(contentH / ratio, imgH - srcY);
+
+      // Create a cropped canvas for this page
+      const pageCanvas = document.createElement('canvas');
+      pageCanvas.width = imgW;
+      pageCanvas.height = srcH;
+      const ctx = pageCanvas.getContext('2d');
+      ctx.drawImage(canvas, 0, srcY, imgW, srcH, 0, 0, imgW, srcH);
+
+      const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.95);
+      const destH = srcH * ratio;
+      pdf.addImage(pageImgData, 'JPEG', margin, margin, contentW, destH);
+    }
+
+    pdf.save('Profilo_Igiene_Manageriale.pdf');
+  } catch (err) {
+    console.error('PDF generation error:', err);
+    alert('Si è verificato un errore nella generazione del PDF. Prova con la stampa del browser (Ctrl+P).');
+  }
+
+  el.style.maxWidth = origMaxWidth;
+  el.style.margin = origMargin;
+  buttons.forEach(b => b.style.display = '');
+}
+</script>
+</body>
+</html>
